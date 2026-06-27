@@ -1,0 +1,15 @@
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body {
+  font-family: 'Inter', 'Segoe UI', sans-serif;
+  background: #030712;
+  color: white;
+  overflow-x: hidden;
+}
+::-webkit-scrollbar { width: 5px; }
+::-webkit-scrollbar-track { background: #0f172a; }
+::-webkit-scrollbar-thumb { background: linear-gradient(#7c3aed, #2563eb); border-radius: 3px; }
+input, select, textarea {
+  font-family: inherit;
+  outline: none;
+}
+a { text-decoration: none; color: inherit; }

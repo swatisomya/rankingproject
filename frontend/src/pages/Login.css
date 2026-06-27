@@ -1,0 +1,172 @@
+* { margin:0; padding:0; box-sizing:border-box; }
+.auth-container {
+  min-height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  position: relative;
+  overflow: hidden;
+  background: #030712;
+}
+.auth-container::before {
+  content: "";
+  position: absolute;
+  width: 600px; height: 600px;
+  left: -200px; top: 50%;
+  transform: translateY(-50%);
+  background: radial-gradient(circle, rgba(59,130,246,.2) 0%, transparent 70%);
+  filter: blur(60px);
+  z-index: 0;
+}
+.auth-container::after {
+  content: "";
+  position: absolute;
+  width: 600px; height: 600px;
+  right: -200px; top: 50%;
+  transform: translateY(-50%);
+  background: radial-gradient(circle, rgba(168,85,247,.2) 0%, transparent 70%);
+  filter: blur(60px);
+  z-index: 0;
+}
+.particles {
+  position: absolute;
+  width: 100%; height: 100%;
+  background-image:
+    radial-gradient(#00d4ff 1px, transparent 1px),
+    radial-gradient(#a855f7 1px, transparent 1px);
+  background-size: 80px 80px;
+  background-position: 0 0, 40px 40px;
+  opacity: .1;
+  animation: moveParticles 25s linear infinite;
+  z-index: 1;
+}
+@keyframes moveParticles {
+  from { transform: translateY(0); }
+  to { transform: translateY(-80px); }
+}
+.auth-card {
+  position: relative;
+  z-index: 2;
+  width: 400px;
+  padding: 36px;
+  border-radius: 28px;
+  background: rgba(15,23,42,.8);
+  backdrop-filter: blur(24px);
+  border: 1px solid rgba(255,255,255,.07);
+  box-shadow: 0 0 40px rgba(139,92,246,.15), 0 20px 60px rgba(0,0,0,.5);
+}
+.logo-icon {
+  text-align: center;
+  font-size: 36px;
+  color: #8b5cf6;
+  margin-bottom: 6px;
+  font-weight: 800;
+}
+.title {
+  text-align: center;
+  font-size: 42px;
+  font-weight: 800;
+  background: linear-gradient(90deg, #00d4ff, #8b5cf6);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  margin-bottom: 6px;
+}
+.subtitle {
+  text-align: center;
+  color: #64748b;
+  font-size: 13px;
+  margin-bottom: 28px;
+}
+.auth-card input {
+  width: 100%;
+  padding: 13px 16px;
+  margin-bottom: 12px;
+  border-radius: 12px;
+  background: rgba(255,255,255,.04);
+  border: 1px solid rgba(124,58,237,.4);
+  color: white;
+  font-size: 15px;
+  transition: border-color .3s, box-shadow .3s;
+}
+.auth-card input:focus {
+  border-color: #7c3aed;
+  box-shadow: 0 0 0 3px rgba(124,58,237,.15);
+}
+.auth-card input::placeholder { color: #475569; }
+.auth-card button {
+  width: 100%;
+  padding: 13px;
+  border: none;
+  border-radius: 12px;
+  cursor: pointer;
+  color: white;
+  font-size: 16px;
+  font-weight: 600;
+  background: linear-gradient(90deg, #2563eb, #7c3aed);
+  box-shadow: 0 4px 20px rgba(124,58,237,.4);
+  transition: all .3s;
+  margin-top: 4px;
+}
+.auth-card button:hover { transform: translateY(-2px); box-shadow: 0 8px 30px rgba(124,58,237,.5); }
+.auth-card button:disabled { opacity: .6; cursor: not-allowed; transform: none; }
+.divider {
+  text-align: center;
+  color: #334155;
+  margin: 20px 0;
+  position: relative;
+}
+.divider::before, .divider::after {
+  content: "";
+  position: absolute;
+  top: 50%;
+  width: 42%;
+  height: 1px;
+  background: rgba(255,255,255,.06);
+}
+.divider::before { left: 0; }
+.divider::after { right: 0; }
+.socials { display: flex; gap: 10px; }
+.social-btn {
+  flex: 1;
+  padding: 11px;
+  border-radius: 11px;
+  color: white !important;
+  background: rgba(255,255,255,.04) !important;
+  border: 1px solid rgba(255,255,255,.08) !important;
+  font-size: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  transition: all .3s;
+  cursor: pointer;
+}
+.social-btn:hover {
+  background: rgba(255,255,255,.08) !important;
+  border-color: rgba(255,255,255,.15) !important;
+  transform: translateY(-1px);
+}
+.signup-text { margin-top: 22px; text-align: center; color: #64748b; font-size: 14px; }
+.signup-text a { color: #60a5fa; font-weight: 500; }
+.signup-text a:hover { color: #93c5fd; }
+.password-box { position: relative; margin-bottom: 12px; }
+.password-box input { margin-bottom: 0; }
+.eye-icon {
+  position: absolute;
+  right: 14px; top: 50%;
+  transform: translateY(-50%);
+  cursor: pointer;
+  font-size: 18px;
+  color: #475569;
+  transition: color .3s;
+}
+.eye-icon:hover { color: #00d4ff; }
+.error-msg {
+  background: rgba(239,68,68,.1);
+  border: 1px solid rgba(239,68,68,.3);
+  border-radius: 10px;
+  padding: 10px 14px;
+  color: #f87171;
+  font-size: 13px;
+  margin-bottom: 12px;
+}
