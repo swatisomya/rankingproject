@@ -17,7 +17,7 @@ function Login() {
     if (!email || !password) { setError("Please fill in all fields"); return; }
     setLoading(true);
     try {
-      const response = await fetch("http://127.0.0.1:5000/login", {
+      const response = await fetch("https://rankingproject.onrender.com/login",  {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email, password })
@@ -41,7 +41,7 @@ function Login() {
     try {
       const user = await signInWithGoogle();
 
-      const response = await fetch("http://127.0.0.1:5000/google-auth", {
+      const response = await fetch("https://rankingproject.onrender.com/google-auth",  {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({

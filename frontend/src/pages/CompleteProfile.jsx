@@ -16,7 +16,7 @@ function CompleteProfile() {
     }
     setLoading(true);
     try {
-      await fetch(`http://127.0.0.1:5000/update-profile/${user_id}`, {
+      await fetch(`https://rankingproject.onrender.com/update-profile/${user_id}`,  {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ ...form, year: parseInt(form.year) })
