@@ -1,4 +1,4 @@
-const BASE_URL = "http://127.0.0.1:5000";
+const BASE_URL = "https://rankingproject.onrender.com";
 
 export const loginUser = async (email, password) => {
   const res = await fetch(`${BASE_URL}/login`, {
