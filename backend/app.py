@@ -7,6 +7,7 @@ from models.profile import Profile
 from routes.auth_routes import auth_bp
 from routes.profile_routes import profile_bp
 from routes.leaderboard_routes import leaderboard_bp
+import os
 
 app = Flask(__name__)
 CORS(app)
@@ -20,9 +21,12 @@ app.register_blueprint(leaderboard_bp)
 with app.app_context():
     db.create_all()
 
+
 @app.route("/")
 def home():
     return "RankHub Backend Running"
 
+
 if __name__ == "__main__":
-    app.run(debug=True)
+    port = int(os.environ.get("PORT", 10000))
+    app.run(host="0.0.0.0", port=port)
