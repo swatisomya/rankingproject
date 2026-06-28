@@ -18,7 +18,6 @@ app.register_blueprint(profile_bp)
 app.register_blueprint(leaderboard_bp)
 
 with app.app_context():
-    db.drop_all()
     db.create_all()
 
 @app.route("/")
