@@ -34,8 +34,8 @@ export const getLeaderboard = async () => {
   return res.json();
 };
 
-export const updateUserProfile = async (user_id, data) => {
-  const res = await fetch(`${BASE_URL}/update-profile/${user_id}`, {
+export const updateUser = async (user_id, data) => {
+  const res = await fetch(`${BASE_URL}/update-user/${user_id}`, {
     method: "POST", headers: { "Content-Type": "application/json" },
     body: JSON.stringify(data)
   });
