@@ -2,29 +2,78 @@ from flask import Blueprint, request, jsonify
 from models.user import User
 from models.profile import Profile
 from database.db import db
+from services.leetcode_service import get_leetcode_data
+from services.codeforces_service import get_codeforces_data
 from services.github_service import get_github_data
+from datetime import datetime
 
 profile_bp = Blueprint("profile", __name__)
+
+@profile_bp.route("/update-user/<int:user_id>", methods=["POST"])
+def update_user(user_id):
+    data = request.get_json()
+    user = User.query.get(user_id)
+    if not user:
+        return jsonify({"message": "User not found"}), 404
+    user.name = data.get("name", user.name)
+    user.college = data.get("college", user.college)
+    user.branch = data.get("branch", user.branch)
+    user.year = data.get("year", user.year)
+    db.session.commit()
+    return jsonify({"message": "Profile updated successfully"})
 
 @profile_bp.route("/link-profile", methods=["POST"])
 def link_profile():
     data = request.get_json()
-    existing = Profile.query.filter_by(user_id=data["user_id"]).first()
-    if existing:
-        existing.leetcode_username = data.get("leetcode_username", existing.leetcode_username)
-        existing.codeforces_username = data.get("codeforces_username", existing.codeforces_username)
-        existing.github_username = data.get("github_username", existing.github_username)
-        db.session.commit()
-        return jsonify({"message": "Profile Updated Successfully"})
-    profile = Profile(
-        user_id=data["user_id"],
-        leetcode_username=data.get("leetcode_username"),
-        codeforces_username=data.get("codeforces_username"),
-        github_username=data.get("github_username")
-    )
-    db.session.add(profile)
+    user_id = data["user_id"]
+    profile = Profile.query.filter_by(user_id=user_id).first()
+    if not profile:
+        profile = Profile(user_id=user_id)
+        db.session.add(profile)
+
+    results = {}
+
+    if data.get("leetcode_username"):
+        lc = get_leetcode_data(data["leetcode_username"])
+        if lc:
+            profile.leetcode_username = data["leetcode_username"]
+            profile.leetcode_verified = True
+            profile.leetcode_total = lc.get("totalSolved", 0)
+            profile.leetcode_easy = lc.get("easySolved", 0)
+            profile.leetcode_medium = lc.get("mediumSolved", 0)
+            profile.leetcode_hard = lc.get("hardSolved", 0)
+            profile.leetcode_ranking = lc.get("ranking", 0)
+            profile.leetcode_streak = lc.get("streak", 0)
+            results["leetcode"] = "connected"
+        else:
+            results["leetcode"] = "invalid"
+
+    if data.get("codeforces_username"):
+        cf = get_codeforces_data(data["codeforces_username"])
+        if cf:
+            profile.codeforces_username = data["codeforces_username"]
+            profile.codeforces_verified = True
+            profile.cf_rating = cf.get("rating", 0)
+            profile.cf_max_rating = cf.get("maxRating", 0)
+            profile.cf_rank = cf.get("rank", "")
+            profile.cf_max_rank = cf.get("maxRank", "")
+            profile.cf_contribution = cf.get("contribution", 0)
+            results["codeforces"] = "connected"
+        else:
+            results["codeforces"] = "invalid"
+
+    if data.get("github_username"):
+        gh = get_github_data(data["github_username"])
+        if gh:
+            profile.github_username = data["github_username"]
+            profile.github_verified = True
+            results["github"] = "connected"
+        else:
+            results["github"] = "invalid"
+
+    profile.last_synced = datetime.utcnow()
     db.session.commit()
-    return jsonify({"message": "Profile Linked Successfully"})
+    return jsonify({"message": "Profiles updated", "results": results})
 
 @profile_bp.route("/dashboard/<int:user_id>", methods=["GET"])
 def dashboard(user_id):
@@ -32,9 +81,7 @@ def dashboard(user_id):
     if not user:
         return jsonify({"message": "User not found"}), 404
     profile = Profile.query.filter_by(user_id=user_id).first()
-    github_data = {}
-    if profile and profile.github_username:
-        github_data = get_github_data(profile.github_username) or {}
+
     return jsonify({
         "user": {
             "id": user.id,
@@ -44,10 +91,24 @@ def dashboard(user_id):
             "branch": user.branch,
             "year": user.year
         },
-        "github": github_data,
         "profile": {
             "leetcode_username": profile.leetcode_username if profile else None,
             "codeforces_username": profile.codeforces_username if profile else None,
-            "github_username": profile.github_username if profile else None
+            "github_username": profile.github_username if profile else None,
+            "leetcode_verified": profile.leetcode_verified if profile else False,
+            "codeforces_verified": profile.codeforces_verified if profile else False,
+            "github_verified": profile.github_verified if profile else False,
+            "leetcode_total": profile.leetcode_total if profile else 0,
+            "leetcode_easy": profile.leetcode_easy if profile else 0,
+            "leetcode_medium": profile.leetcode_medium if profile else 0,
+            "leetcode_hard": profile.leetcode_hard if profile else 0,
+            "leetcode_ranking": profile.leetcode_ranking if profile else 0,
+            "leetcode_streak": profile.leetcode_streak if profile else 0,
+            "cf_rating": profile.cf_rating if profile else 0,
+            "cf_max_rating": profile.cf_max_rating if profile else 0,
+            "cf_rank": profile.cf_rank if profile else "",
+            "cf_max_rank": profile.cf_max_rank if profile else "",
+            "cf_contribution": profile.cf_contribution if profile else 0,
+            "last_synced": profile.last_synced.isoformat() if profile and profile.last_synced else None
         } if profile else None
     })
