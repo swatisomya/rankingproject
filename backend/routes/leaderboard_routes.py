@@ -9,16 +9,33 @@ leaderboard_bp = Blueprint("leaderboard", __name__)
 
 @leaderboard_bp.route("/leaderboard", methods=["GET"])
 def leaderboard():
-    profiles = Profile.query.all()
+    users = User.query.all()
     result = []
 
-    for profile in profiles:
-        user = User.query.get(profile.user_id)
-        if not user:
-            continue
+    for user in users:
+        profile = Profile.query.filter_by(user_id=user.id).first()
 
-        leetcode_data = get_leetcode_data(profile.leetcode_username) if profile.leetcode_username else None
-        codeforces_data = get_codeforces_data(profile.codeforces_username) if profile.codeforces_username else None
+        leetcode_data = None
+        codeforces_data = None
+
+        if profile:
+            if profile.leetcode_verified and profile.leetcode_total:
+                leetcode_data = {
+                    "totalSolved": profile.leetcode_total,
+                    "easySolved": profile.leetcode_easy,
+                    "mediumSolved": profile.leetcode_medium,
+                    "hardSolved": profile.leetcode_hard,
+                    "ranking": profile.leetcode_ranking,
+                    "streak": profile.leetcode_streak
+                }
+            if profile.codeforces_verified and profile.cf_rating:
+                codeforces_data = {
+                    "rating": profile.cf_rating,
+                    "maxRating": profile.cf_max_rating,
+                    "rank": profile.cf_rank,
+                    "maxRank": profile.cf_max_rank
+                }
+
         score = calculate_score(leetcode_data, codeforces_data)
 
         result.append({

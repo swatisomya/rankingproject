@@ -22,10 +22,28 @@ def update_user(user_id):
     db.session.commit()
     return jsonify({"message": "Profile updated successfully"})
 
+@profile_bp.route("/verify-leetcode/<username>", methods=["GET"])
+def verify_leetcode(username):
+    print(f"Verifying LeetCode username: {username}")
+    data = get_leetcode_data(username)
+    print(f"LeetCode data: {data}")
+    if data:
+        return jsonify({"valid": True, "data": data})
+    return jsonify({"valid": False, "error": "Username not found"}), 404
+
+@profile_bp.route("/verify-codeforces/<username>", methods=["GET"])
+def verify_codeforces(username):
+    from services.codeforces_service import get_codeforces_data
+    data = get_codeforces_data(username)
+    if data:
+        return jsonify({"valid": True, "data": data})
+    return jsonify({"valid": False, "error": "Username not found"}), 404
+
 @profile_bp.route("/link-profile", methods=["POST"])
 def link_profile():
     data = request.get_json()
     user_id = data["user_id"]
+    
     profile = Profile.query.filter_by(user_id=user_id).first()
     if not profile:
         profile = Profile(user_id=user_id)
@@ -34,9 +52,12 @@ def link_profile():
     results = {}
 
     if data.get("leetcode_username"):
-        lc = get_leetcode_data(data["leetcode_username"])
+        username = data["leetcode_username"].strip()
+        print(f"Linking LeetCode: {username}")
+        lc = get_leetcode_data(username)
+        print(f"LeetCode result: {lc}")
         if lc:
-            profile.leetcode_username = data["leetcode_username"]
+            profile.leetcode_username = username
             profile.leetcode_verified = True
             profile.leetcode_total = lc.get("totalSolved", 0)
             profile.leetcode_easy = lc.get("easySolved", 0)
@@ -47,11 +68,14 @@ def link_profile():
             results["leetcode"] = "connected"
         else:
             results["leetcode"] = "invalid"
+    elif data.get("keep_leetcode") and profile.leetcode_username:
+        results["leetcode"] = "connected"
 
     if data.get("codeforces_username"):
-        cf = get_codeforces_data(data["codeforces_username"])
+        username = data["codeforces_username"].strip()
+        cf = get_codeforces_data(username)
         if cf:
-            profile.codeforces_username = data["codeforces_username"]
+            profile.codeforces_username = username
             profile.codeforces_verified = True
             profile.cf_rating = cf.get("rating", 0)
             profile.cf_max_rating = cf.get("maxRating", 0)
@@ -61,15 +85,20 @@ def link_profile():
             results["codeforces"] = "connected"
         else:
             results["codeforces"] = "invalid"
+    elif data.get("keep_codeforces") and profile.codeforces_username:
+        results["codeforces"] = "connected"
 
     if data.get("github_username"):
-        gh = get_github_data(data["github_username"])
+        username = data["github_username"].strip()
+        gh = get_github_data(username)
         if gh:
-            profile.github_username = data["github_username"]
+            profile.github_username = username
             profile.github_verified = True
             results["github"] = "connected"
         else:
             results["github"] = "invalid"
+    elif data.get("keep_github") and profile.github_username:
+        results["github"] = "connected"
 
     profile.last_synced = datetime.utcnow()
     db.session.commit()
