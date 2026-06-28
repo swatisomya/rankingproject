@@ -1,5 +1,8 @@
+import os
+
 class Config:
-
-    SQLALCHEMY_DATABASE_URI = "sqlite:///ranking.db"
-
+    uri = os.environ.get("DATABASE_URL", "sqlite:///ranking.db")
+    if uri and uri.startswith("postgres://"):
+        uri = uri.replace("postgres://", "postgresql://", 1)
+    SQLALCHEMY_DATABASE_URI = uri
     SQLALCHEMY_TRACK_MODIFICATIONS = False
